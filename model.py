@@ -1,7 +1,7 @@
 import  torch
 from    torch import nn
 from    torch.nn import functional as F
-from    layer import DistributedGraphConvolution
+from    layer import GraphConvolution, DistributedGraphConvolution
 
 from    config import args
 

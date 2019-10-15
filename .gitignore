@@ -1,2 +1,7 @@
 .idea
+data
+*.swp
+*.so
+*.o
+main
 __pycache__

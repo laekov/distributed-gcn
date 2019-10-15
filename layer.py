@@ -89,14 +89,14 @@ class DistributedGraphConvolution(GraphConvolution):
                     feats[current_feats ^ 1].data_ptr(),
                     feats[current_feats].shape.numel(), i)
             if out is None:
-                out = torch.sparse.mm(support[comm_rank], feats[current_feat])
+                out = torch.sparse.mm(supports[comm_rank], feats[current_feats])
             else:
-                out += torch.sparse.mm(support[comm_rank], feats[current_feat])
+                out += torch.sparse.mm(supports[comm_rank], feats[current_feats])
             current_feats ^= 1
             gops.wait()
         
         if self.bias is not None:
             out += self.bias
 
-        return self.activation(out), support
+        return self.activation(out), supports
        

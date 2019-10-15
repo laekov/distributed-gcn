@@ -4,7 +4,6 @@ import  networkx as nx
 import  scipy.sparse as sp
 from    scipy.sparse.linalg.eigen.arpack import eigsh
 import  sys
-from mpi4py import MPI
 
 
 def parse_index_file(filename):
@@ -26,7 +25,7 @@ def sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_data(dataset_str):
+def load_data(dataset_str, mode='normal'):
     """
     Loads input data from gcn/data directory
 
@@ -76,6 +75,9 @@ def load_data(dataset_str):
         adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
     else:
         adj = graph
+
+    if mode == 'preprocess':
+        return objects[:-1], test_idx_range, adj
 
     labels = np.vstack((ally, ty))
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
