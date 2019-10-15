@@ -1,0 +1,4 @@
+#!/bin/bash
+COMM_RANK=$OMPI_COMM_WORLD_RANK
+COMM_SIZE=$OMPI_COMM_WORLD_SIZE
+python -u distributed_train.py --dataset=cora_${COMM_RANK}_of_${COMM_SIZE}
