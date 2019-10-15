@@ -4,6 +4,7 @@ import  networkx as nx
 import  scipy.sparse as sp
 from    scipy.sparse.linalg.eigen.arpack import eigsh
 import  sys
+from mpi4py import MPI
 
 
 def parse_index_file(filename):
@@ -71,7 +72,10 @@ def load_data(dataset_str):
 
     features = sp.vstack((allx, tx)).tolil()
     features[test_idx_reorder, :] = features[test_idx_range, :]
-    adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+    if isinstance(graph, dict):
+        adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+    else:
+        adj = graph
 
     labels = np.vstack((ally, ty))
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
