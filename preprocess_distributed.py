@@ -41,7 +41,7 @@ def main():
                 f.write('{}\n'.format(test_idxs.pop(0) - lb))
                 written = True
             if not written:
-                f.write('{}\n'.format(ub - 1))
+                f.write('{}\n'.format(chunk_sz - 1))
         print('{} of {} finished'.format(chunk_id, n))
 
 if __name__ == '__main__':

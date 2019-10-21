@@ -76,6 +76,12 @@ def load_data(dataset_str, mode='normal'):
     else:
         adj = graph
 
+    print('allx shape is {}'.format(allx.shape))
+    print('tx shape is {}'.format(tx.shape))
+    print('features shape is {}'.format(features.shape))
+    print('adj shape is {}'.format(adj[0].shape))
+    return
+
     if mode == 'preprocess':
         return objects[:-1], test_idx_range, adj
 
