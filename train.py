@@ -2,10 +2,12 @@ from __future__ import division
 from __future__ import print_function
 
 import time
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from utils import *
 from models import GCN, MLP
+
+from distributed import RowParallel
 
 # Set random seed
 seed = 123
@@ -24,6 +26,7 @@ flags.DEFINE_float('dropout', 0.5, 'Dropout rate (1 - keep probability).')
 flags.DEFINE_float('weight_decay', 5e-4, 'Weight for L2 loss on embedding matrix.')
 flags.DEFINE_integer('early_stopping', 10, 'Tolerance for early stopping (# of epochs).')
 flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
+flags.DEFINE_integer('num_gpus', 1, 'Number of GPUs to be used to run parallelly.')
 
 # Load data
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(FLAGS.dataset)
@@ -54,6 +57,10 @@ placeholders = {
     'dropout': tf.placeholder_with_default(0., shape=()),
     'num_features_nonzero': tf.placeholder(tf.int32)  # helper variable for sparse dropout
 }
+
+# Create parallelizer
+parallelizer = RowParallel(2)
+parallelizer.peep_graph(adj)
 
 # Create model
 model = model_func(placeholders, input_dim=features[2][1], logging=True)

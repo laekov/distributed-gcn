@@ -1,5 +1,6 @@
 from layers import *
 from metrics import *
+from distributed import NoParallel
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -7,7 +8,7 @@ FLAGS = flags.FLAGS
 
 class Model(object):
     def __init__(self, **kwargs):
-        allowed_kwargs = {'name', 'logging'}
+        allowed_kwargs = {'name', 'logging', 'parallelizer'}
         for kwarg in kwargs.keys():
             assert kwarg in allowed_kwargs, 'Invalid keyword argument: ' + kwarg
         name = kwargs.get('name')
@@ -17,6 +18,8 @@ class Model(object):
 
         logging = kwargs.get('logging', False)
         self.logging = logging
+
+        self.parallelizer = kwargs.get('parallelizer', NoParallel())
 
         self.vars = {}
         self.placeholders = {}
@@ -169,20 +172,22 @@ class GCN(Model):
 
     def _build(self):
 
-        self.layers.append(GraphConvolution(input_dim=self.input_dim,
-                                            output_dim=FLAGS.hidden1,
-                                            placeholders=self.placeholders,
-                                            act=tf.nn.relu,
-                                            dropout=True,
-                                            sparse_inputs=True,
-                                            logging=self.logging))
+        self.layers.append(self.parallelizer.parallelize_layer(GraphConvolution(
+            input_dim=self.input_dim,
+            output_dim=FLAGS.hidden1,
+            placeholders=self.placeholders,
+            act=tf.nn.relu,
+            dropout=True,
+            sparse_inputs=True,
+            logging=self.logging)))
 
-        self.layers.append(GraphConvolution(input_dim=FLAGS.hidden1,
-                                            output_dim=self.output_dim,
-                                            placeholders=self.placeholders,
-                                            act=lambda x: x,
-                                            dropout=True,
-                                            logging=self.logging))
+        self.layers.append(self.parallelizer.parallelize_layer(GraphConvolution(
+            input_dim=FLAGS.hidden1,
+            output_dim=self.output_dim,
+            placeholders=self.placeholders,
+            act=lambda x: x,
+            dropout=True,
+            logging=self.logging)))
 
     def predict(self):
         return tf.nn.softmax(self.outputs)

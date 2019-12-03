@@ -376,5 +376,3 @@ class GraphSampleConvolutionSkip(Layer):
 
         return self.act(output), 0
 
-
-
